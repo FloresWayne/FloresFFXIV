@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>犯错次数统计</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .chart-container {
+            width: 90%;
+            margin: 20px auto;
+        }
+        .chart-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .chart-box {
+            width: 48%;
+            min-width: 400px;
+        }
+    </style>
+</head>
+<body>
+    <div class="chart-row">
+        <div class="chart-box">
+            <div class="chart-container">
+                <canvas id="dateChart"></canvas>
+            </div>
+        </div>
+        <div class="chart-box">
+            <div class="chart-container">
+                <canvas id="phaseChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 日期数据
+        const dates = ['3月20日', '3月23日', '3月24日', '3月26日', '3月28日', '3月29日', '3月30日', '3月31日', '4月1日', '4月2日'];
+        
+        // 各职业每天的犯错次数
+        const dateData = {
+            '龙骑': [3, 1, 0, 2, 2, 1, 3, 1, 2, 1],
+            '舞者': [1, 0, 0, 2, 2, 1, 1, 0, 1, 0],
+            '学者': [7, 7, 8, 8, 6, 3, 6, 4, 1, 2],
+            'DK': [2, 2, 1, 3, 2, 0, 2, 0, 1, 2],
+            '占星': [3, 4, 3, 6, 4, 1, 5, 4, 5, 0],
+            '画家': [4, 1, 1, 3, 4, 0, 3, 0, 1, 3],
+            '骑士': [0, 1, 2, 3, 2, 0, 2, 1, 3, 2],
+            '忍者': [1, 2, 0, 1, 1, 0, 0, 1, 0, 1]
+        };
+
+        // 阶段数据
+        const phases = ['P1', 'P2', 'P2.5', 'P3', 'P4'];
+        const phaseData = {
+            '龙骑': [7, 3, 2, 6, 0],
+            '舞者': [3, 4, 2, 3, 0],
+            '学者': [10, 24, 0, 28, 1],
+            'DK': [3, 9, 0, 8, 2],
+            '占星': [6, 12, 0, 19, 1],
+            '画家': [3, 13, 1, 10, 0],
+            '骑士': [1, 8, 0, 13, 1],
+            '忍者': [4, 4, 0, 3, 0]
+        };
+
+        // 日期曲线图
+        const dateCtx = document.getElementById('dateChart').getContext('2d');
+        new Chart(dateCtx, {
+            type: 'line',
+            data: {
+                labels: dates,
+                datasets: Object.keys(dateData).map(job => ({
+                    label: job,
+                    data: dateData[job],
+                    borderColor: getColor(job),
+                    backgroundColor: getColor(job, 0.1),
+                    tension: 0.4,
+                    fill: false
+                }))
+            },
+            options: getChartOptions('各职业每日犯错次数统计 - 曲线图')
+        });
+
+        // 阶段柱状图
+        const phaseCtx = document.getElementById('phaseChart').getContext('2d');
+        new Chart(phaseCtx, {
+            type: 'bar',
+            data: {
+                labels: phases,
+                datasets: Object.keys(phaseData).map(job => ({
+                    label: job,
+                    data: phaseData[job],
+                    backgroundColor: getColor(job, 0.7),
+                    borderColor: getColor(job),
+                    borderWidth: 1
+                }))
+            },
+            options: getChartOptions('各阶段犯错次数统计 - 柱状图')
+        });
+
+        // 颜色生成函数
+        function getColor(job, opacity = 1) {
+            const colors = {
+                '龙骑': `rgba(255, 99, 132, ${opacity})`,
+                '舞者': `rgba(54, 162, 235, ${opacity})`,
+                '学者': `rgba(255, 159, 64, ${opacity})`,
+                'DK': `rgba(75, 192, 192, ${opacity})`,
+                '占星': `rgba(153, 102, 255, ${opacity})`,
+                '画家': `rgba(255, 205, 86, ${opacity})`,
+                '骑士': `rgba(201, 203, 207, ${opacity})`,
+                '忍者': `rgba(255, 99, 71, ${opacity})`
+            };
+            return colors[job];
+        }
+
+        // 图表配置函数
+        function getChartOptions(title) {
+            return {
+                responsive: true,
+                plugins: {
+                    title: {
+                        display: true,
+                        text: title,
+                        font: { size: 16 }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false
+                    },
+                    legend: {
+                        position: 'top',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: '犯错次数' }
+                    },
+                    x: {
+                        title: { display: true, text: title.includes('阶段') ? '游戏阶段' : '日期' }
+                    }
+                },
+                interaction: {
+                    mode: 'nearest',
+                    axis: 'x',
+                    intersect: false
+                }
+            };
+        }
+    </script>
+</body>
+</html>
